@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Order Management</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        /* Admin Container */
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: #0f172a;
+            color: white;
+            padding: 30px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .sidebar-header .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(145deg, #2563eb, #1e40af);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-header .logo-icon i {
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .sidebar-header span {
+            color: #2563eb;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu a {
+            display: block;
+            padding: 15px;
+            color: #94a3b8;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .sidebar-menu a i {
+            margin-right: 12px;
+            width: 20px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            color: #0f172a;
+        }
+
+        .header p {
+            color: #64748b;
+            margin-top: 5px;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .header-stat {
+            text-align: center;
+            padding: 0 20px;
+            border-left: 2px solid #e2e8f0;
+        }
+
+        .header-stat:first-child {
+            border-left: none;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2563eb;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        /* Filters */
+        .filters {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-group label {
+            color: #475569;
+            font-weight: 500;
+        }
+
+        .filter-select {
+            padding: 10px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: #1e293b;
+            background: white;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            border-color: #2563eb;
+            outline: none;
+        }
+
+        .search-box {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 0 15px;
+        }
+
+        .search-box i {
+            color: #94a3b8;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: none;
+            font-size: 0.95rem;
+        }
+
+        .search-box input:focus {
+            outline: none;
+        }
+
+        /* Orders List */
+        .orders-list {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-title h2 {
+            font-size: 1.4rem;
+            color: #0f172a;
+        }
+
+        .badge {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .order-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .order-card:hover {
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-color: #2563eb;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .order-number {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2563eb;
+        }
+
+        .order-date {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .status-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-paid {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .order-details {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 20px;
+        }
+
+        .detail-section h4 {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .detail-section p {
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+
+        .detail-section strong {
+            color: #0f172a;
+        }
+
+        .profit {
+            color: #059669;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .supplier-box {
+            background: #f8fafc;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #2563eb;
+        }
+
+        .supplier-box h4 {
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+
+        .address-box {
+            background: #f1f5f9;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37,99,235,0.3);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .btn-info {
+            background: #0891b2;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #0e7490;
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+            transform: translateY(-2px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: #64748b;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .page-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .page-btn:hover,
+        .page-btn.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 80px;
+                padding: 20px 10px;
+            }
+
+            .sidebar-header h2,
+            .sidebar-menu a span {
+                display: none;
+            }
+
+            .sidebar-menu a i {
+                margin-right: 0;
+                font-size: 1.2rem;
+            }
+
+            .main-content {
+                margin-left: 80px;
+            }
+
+            .order-details {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h2>Ecommerce <span>Excellence</span></h2>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li><a href="#" class="active"><i class="fas fa-shopping-bag"></i> <span>Orders</span></a></li>
+                <li><a href="#"><i class="fas fa-box"></i> <span>Products</span></a></li>
+                <li><a href="#"><i class="fas fa-truck"></i> <span>Suppliers</span></a></li>
+                <li><a href="#"><i class="fas fa-users"></i> <span>Customers</span></a></li>
+                <li><a href="#"><i class="fas fa-chart-line"></i> <span>Analytics</span></a></li>
+                <li><a href="#"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+                <li style="margin-top: 50px;"><a href="/"><i class="fas fa-arrow-left"></i> <span>Back to Site</span></a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div>
+                    <h1>Order Management</h1>
+                    <p>Forward orders to suppliers and track fulfillment</p>
+                </div>
+                <div class="header-stats">
+                    <div class="header-stat">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                    <div class="header-stat">
+                        <div class="stat-value">5</div>
+                        <div class="stat-label">Forwarded</div>
+                    </div>
+                    <div class="header-stat">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Delivered</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters">
+                <div class="filter-group">
+                    <label>Status:</label>
+                    <select class="filter-select">
+                        <option>All Orders</option>
+                        <option>Pending</option>
+                        <option>Forwarded</option>
+                        <option>Shipped</option>
+                        <option>Delivered</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Date:</label>
+                    <select class="filter-select">
+                        <option>Today</option>
+                        <option>This Week</option>
+                        <option>This Month</option>
+                        <option>Custom</option>
+                    </select>
+                </div>
+
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search orders by number, customer, or supplier...">
+                </div>
+            </div>
+
+            <!-- Orders List -->
+            <div class="orders-list">
+                <div class="section-title">
+                    <h2>Pending Orders <span class="badge">8 new</span></h2>
+                    <span style="color: #64748b;">Need to forward to supplier</span>
+                </div>
+
+                {% if orders %}
+                    {% for order in orders %}
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div>
+                                <span class="order-number">{{ order.order_number }}</span>
+                                <span class="order-date"> | {{ order.date }}</span>
+                            </div>
+                            <div class="status-group">
+                                <span class="status-badge status-pending">{{ order.status }}</span>
+                                <span class="status-badge status-paid">{{ order.payment_status }}</span>
+                            </div>
+                        </div>
+
+                        <div class="order-details">
+                            <div class="detail-section">
+                                <h4>Customer Details</h4>
+                                <p><strong>{{ order.customer_name }}</strong></p>
+                                <p>📞 {{ order.customer_phone }}</p>
+                                <p>📧 {{ order.customer_email }}</p>
+                            </div>
+
+                            <div class="detail-section">
+                                <h4>Product Details</h4>
+                                <p><strong>{{ order.product }}</strong></p>
+                                <p>Quantity: {{ order.quantity }}</p>
+                                <p>Customer Paid: ₹{{ order.customer_paid }}</p>
+                            </div>
+
+                            <div class="detail-section">
+                                <h4>Financials</h4>
+                                <p>Supplier Cost: ₹{{ order.supplier_cost }}</p>
+                                <p class="profit">Your Profit: ₹{{ order.your_profit }}</p>
+                                <p>Payment: {{ order.payment_method }}</p>
+                            </div>
+                        </div>
+
+                        <div class="supplier-box">
+                            <h4><i class="fas fa-truck"></i> Forward Order to:</h4>
+                            <p><strong>{{ order.supplier_name }}</strong></p>
+                            <p>📞 {{ order.supplier_phone }}</p>
+                            <p>📧 {{ order.supplier_email }}</p>
+                            <p>Supplier Cost: ₹{{ order.supplier_cost }}</p>
+                        </div>
+
+                        <div class="address-box">
+                            <h4><i class="fas fa-map-marker-alt"></i> Shipping Address</h4>
+                            <p>{{ order.shipping_address }}</p>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" onclick="forwardOrder('{{ order.order_number }}')">
+                                <i class="fas fa-forward"></i> Forward to Supplier
+                            </button>
+                            <button class="btn btn-success" onclick="markShipped('{{ order.order_number }}')">
+                                <i class="fas fa-truck"></i> Mark as Shipped
+                            </button>
+                            <button class="btn btn-info" onclick="viewDetails('{{ order.order_number }}')">
+                                <i class="fas fa-eye"></i> View Details
+                            </button>
+                            <button class="btn btn-warning" onclick="contactSupplier('{{ order.order_number }}')">
+                                <i class="fas fa-phone"></i> Contact Supplier
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-box-open"></i>
+                        <h3>No Orders Yet</h3>
+                        <p>When customers place orders, they will appear here</p>
+                    </div>
+                {% endif %}
+
+                <!-- Pagination -->
+                <div class="pagination">
+                    <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">4</button>
+                    <button class="page-btn">5</button>
+                    <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function forwardOrder(orderNumber) {
+            if(confirm(`Forward order ${orderNumber} to supplier?`)) {
+                alert(`✅ Order ${orderNumber} forwarded to supplier!\n\nSupplier will be notified via email.`);
+                // In production, this would send email to supplier
+            }
+        }
+
+        function markShipped(orderNumber) {
+            if(confirm(`Mark order ${orderNumber} as shipped?`)) {
+                alert(`📦 Order ${orderNumber} marked as shipped.\n\nCustomer will be notified.`);
+            }
+        }
+
+        function viewDetails(orderNumber) {
+            alert(`Viewing details for order ${orderNumber}`);
+            // In production, this would open order details modal
+        }
+
+        function contactSupplier(orderNumber) {
+            alert(`📞 Contacting supplier for order ${orderNumber}`);
+            // In production, this might open email or phone app
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }} - Ecommerce Excellence</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #1e293b;
+            background: #f8fafc;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #334155;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #2563eb;
+        }
+
+        .login-btn {
+            background: #2563eb;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+
+        .login-btn:hover {
+            background: #1d4ed8;
+            color: white;
+        }
+
+        /* Product Container */
+        .product-container {
+            max-width: 1280px;
+            margin: 50px auto;
+            padding: 0 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+        }
+
+        .product-image img {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .product-info h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #0f172a;
+        }
+
+        .category {
+            color: #2563eb;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .price {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #059669;
+            margin-bottom: 20px;
+        }
+
+        .description {
+            color: #475569;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .supplier-info {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #2563eb;
+        }
+
+        .stock-status {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #d1fae5;
+            color: #065f46;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .order-form {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #2563eb;
+            outline: none;
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .quantity-btn {
+            width: 45px;
+            height: 45px;
+            border: 2px solid #2563eb;
+            background: white;
+            color: #2563eb;
+            font-size: 1.3rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .quantity-btn:hover {
+            background: #2563eb;
+            color: white;
+        }
+
+        .quantity-input {
+            width: 80px;
+            text-align: center;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .payment-methods {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 10px;
+        }
+
+        .payment-option {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .payment-option.selected {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .payment-option input[type="radio"] {
+            margin-right: 15px;
+        }
+
+        .place-order-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .place-order-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37,99,235,0.3);
+        }
+
+        .login-reminder {
+            text-align: center;
+            padding: 40px;
+            background: #fff3cd;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+
+        .login-reminder a {
+            display: inline-block;
+            margin: 10px;
+            padding: 12px 30px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #64748b;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            color: #2563eb;
+        }
+
+        /* Footer */
+        .footer {
+            background: #0f172a;
+            color: white;
+            padding: 60px 0 30px;
+            margin-top: 60px;
+        }
+
+        .footer-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+
+        .footer-section h4 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            color: #94a3b8;
+            text-decoration: none;
+            line-height: 1.8;
+        }
+
+        .footer-section a:hover {
+            color: #2563eb;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            margin-top: 30px;
+            border-top: 1px solid #1e293b;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <!-- UPDATED LOGO -->
+            <a href="/" class="premium-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="logo-text">
+                    <div class="logo-main">
+                        <span class="ecommerce">Ecommerce</span>
+                        <span class="excellence">Excellence</span>
+                    </div>
+                    <div class="logo-tagline">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>THRISSUR, KERALA</span>
+                        <span class="location">🇮🇳 INDIA</span>
+                    </div>
+                </div>
+            </a>
+
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/#services">Services</a>
+                <a href="/dropship">Shop</a>
+                <a href="/about">About</a>
+                <a href="/contact">Contact</a>
+                {% if session.user_id %}
+                <a href="/customer/dashboard">Dashboard</a>
+                <a href="/customer/logout">Logout</a>
+                {% else %}
+                <a href="/customer/login?next={{ request.path }}" class="login-btn">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Product Details -->
+    <div class="product-container">
+        <div class="product-image">
+            <img src="{{ product.image }}" alt="{{ product.name }}">
+        </div>
+
+        <div class="product-info">
+            <div class="category">{{ product.category }}</div>
+            <h1>{{ product.name }}</h1>
+            <div class="price">₹{{ product.price }}</div>
+            <p class="description">{{ product.description }}</p>
+
+            <div class="supplier-info">
+                <p><strong>Sold by:</strong> {{ product.supplier_name }}</p>
+                <p><strong>Stock:</strong> {{ product.stock }} units available</p>
+                <p><strong>Delivery:</strong> 3-5 business days</p>
+            </div>
+
+            <div class="stock-status">
+                <i class="fas fa-check-circle"></i> In Stock
+            </div>
+
+            {% if session.user_id %}
+            <div class="order-form">
+                <h3 style="margin-bottom: 20px;">Place Your Order</h3>
+                <form id="orderForm">
+                    <input type="hidden" name="product_id" value="{{ product.id }}">
+
+                    <div class="quantity-selector">
+                        <button type="button" class="quantity-btn" onclick="changeQty(-1)">-</button>
+                        <input type="number" name="quantity" id="quantity" value="1" min="1" max="{{ product.stock }}" class="quantity-input" readonly>
+                        <button type="button" class="quantity-btn" onclick="changeQty(1)">+</button>
+                        <span style="margin-left: 15px; font-weight: 600;">Total: ₹<span id="totalPrice">{{ product.price }}</span></span>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" name="name" placeholder="Full Name *" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" name="email" placeholder="Email *" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="tel" name="phone" placeholder="Phone *" required>
+                    </div>
+                    <div class="form-group">
+                        <textarea name="address" placeholder="Shipping Address *" rows="3" required></textarea>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 15px;">
+                        <input type="text" name="city" placeholder="City *" required>
+                        <input type="text" name="state" placeholder="State *" required>
+                        <input type="text" name="pincode" placeholder="Pincode *" required>
+                    </div>
+
+                    <div class="payment-methods">
+                        <div style="font-weight: 600; margin-bottom: 15px;">Payment Method</div>
+                        <label class="payment-option">
+                            <input type="radio" name="payment_method" value="cod" checked>
+                            <span>Cash on Delivery</span>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="payment_method" value="card">
+                            <span>Card Payment</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="place-order-btn" id="placeOrderBtn">
+                        Place Order • ₹<span id="finalTotal">{{ product.price }}</span>
+                    </button>
+                </form>
+            </div>
+            {% else %}
+            <div class="login-reminder">
+                <i class="fas fa-lock" style="font-size: 2rem; margin-bottom: 15px;"></i>
+                <h3>Please Login to Order</h3>
+                <p>Login to access your address book and order history</p>
+                <a href="/customer/login?next={{ request.path }}">Login</a>
+                <a href="/customer/register?next={{ request.path }}" style="background: #10b981;">Register</a>
+            </div>
+            {% endif %}
+
+            <a href="/dropship" class="back-link">← Back to Products</a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Ecommerce Excellence</h4>
+                <p>Your trusted partner from Thrissur, Kerala for ecommerce outsourcing and dropshipping services since 2019.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <p><a href="/">Home</a></p>
+                <p><a href="/#services">Services</a></p>
+                <p><a href="/dropship">Shop</a></p>
+                <p><a href="/about">About Us</a></p>
+                <p><a href="/contact">Contact</a></p>
+            </div>
+            <div class="footer-section">
+                <h4>Contact Info</h4>
+                <p><i class="fas fa-map-marker-alt"></i> Thrissur, Kerala</p>
+                <p><i class="fas fa-phone"></i> +91 98765 43210</p>
+                <p><i class="fas fa-envelope"></i> info@ecommerce-excellence.com</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2024 Ecommerce Excellence. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const price = {{ product.price }};
+
+        function changeQty(delta) {
+            const qtyInput = document.getElementById('quantity');
+            let qty = parseInt(qtyInput.value) + delta;
+            if (qty < 1) qty = 1;
+            if (qty > {{ product.stock }}) qty = {{ product.stock }};
+            qtyInput.value = qty;
+            document.getElementById('totalPrice').textContent = price * qty;
+            document.getElementById('finalTotal').textContent = price * qty;
+        }
+
+        document.getElementById('orderForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('placeOrderBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                alert('Order placed successfully!');
+                window.location.href = '/customer/dashboard';
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
